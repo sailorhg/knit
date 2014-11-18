@@ -1,6 +1,7 @@
 require 'sinatra'
-require 'Open3'
 require 'haml'
+require 'knitting_pattern'
+require 'pattern_disk_drive'
 
 get '/upload' do
   haml :upload
@@ -8,12 +9,12 @@ end
 
 post '/upload' do
   filename = 'uploads/' + params['myfile'][:filename]
-  File.open(filename, "w") do |f|
-    f.write(params['myfile'][:tempfile].read)
-  end
+  File.write(filename, params['myfile'][:tempfile].read)
 
-  result = `python img2track.py #{filename} . 1.5 60`
+  result = KnittingPattern.from_image!(filename, 1.5, 60)
   puts result
-  stdin, stdout, stderr = Open3.popen3("python knit/PDDemulate.py . /dev/cu.usbserial-FTX20UXH")
-  return "turn on machine, press CE 551, STEP, 1, STEP to load pattern! \nPattern will be available as pattern 901."
+  PatternDiskDrive.serve!
+
+  return "turn on machine, press CE 551, STEP, 1, STEP to load pattern!\n" \
+    "Pattern will be available as pattern 901."
 end
