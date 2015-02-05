@@ -1,7 +1,7 @@
 require 'sinatra'
 require 'haml'
-require 'knitting_pattern'
-require 'pattern_disk_drive'
+require_relative 'knitting_pattern'
+require_relative 'pattern_disk_drive'
 
 get '/upload' do
   haml :upload
